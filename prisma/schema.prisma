@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Character {
+  id        String      @id @default(uuid())
+  name      String
+  species   Subcategory @relation(fields: [speciesId], references: [id])
+  speciesId String
+  status    Status      @relation(fields: [statusId], references: [id])
+  statusId  String
+
+  Participation Participation[]
+}
+
+model Type {
+  id     String   @id @default(uuid())
+  name   String
+  status Status[]
+}
+
+model Status {
+  id     String @id @default(uuid())
+  name   String
+  type   Type   @relation(fields: [typeId], references: [id])
+  typeId String
+
+  Episode Episode[]
+
+  Character Character[]
+}
+
+model Category {
+  id            String        @id @default(uuid())
+  name          String
+  subcategories Subcategory[]
+}
+
+model Subcategory {
+  id         String   @id @default(uuid())
+  name       String
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+
+  Episode Episode[]
+
+  Character Character[]
+}
+
+model Episode {
+  id       String      @id @default(uuid())
+  name     String
+  duration Int
+  season   Subcategory @relation(fields: [seasonId], references: [id])
+  seasonId String
+  status   Status      @relation(fields: [statusId], references: [id])
+  statusId String
+
+  Participation Participation[]
+}
+
+model Participation {
+  id          String    @id @default(uuid())
+  character   Character @relation(fields: [characterId], references: [id])
+  characterId String
+  episode     Episode   @relation(fields: [episodeId], references: [id])
+  episodeId   String
+  init        Int
+  finish      Int
+}
